@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Server missing CIRCLE_API_KEY' }, { status: 500 })
     }
 
-    const resp = await fetch('https://api.circle.com/v1/users/social/token', {
+    const resp = await fetch('https://api.circle.com/v1/w3s/users/social/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
