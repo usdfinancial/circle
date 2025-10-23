@@ -65,7 +65,15 @@ export function setLoginConfigs(configs: {
         deviceEncryptionKey: configs.deviceEncryptionKey,
       },
     },
-    undefined
+    (error: any, result: any) => {
+      if (error) return
+      if (result?.userToken && result?.encryptionKey) {
+        try {
+          localStorage.setItem('circle_user_token', result.userToken)
+          localStorage.setItem('circle_encryption_key', result.encryptionKey)
+        } catch {}
+      }
+    }
   )
 }
 

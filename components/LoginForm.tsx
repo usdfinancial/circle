@@ -56,11 +56,21 @@ export default function LoginForm() {
       // 4) Perform social login via SDK
       await performSocialLogin(p)
 
-      // Retrieve tokens from callback storage
-      const userToken = typeof window !== 'undefined' ? localStorage.getItem('circle_user_token') : null
-      const encryptionKey = typeof window !== 'undefined' ? localStorage.getItem('circle_encryption_key') : null
-      if (!userToken || !encryptionKey) throw new Error('Social login did not return tokens')
-      setAuthentication(userToken, encryptionKey)
+      // Retrieve tokens from callback storage (allow time for redirect/callback)
+      async function waitForTokens(timeoutMs = 15000, intervalMs = 300) {
+        const start = Date.now()
+        while (Date.now() - start < timeoutMs) {
+          const ut = typeof window !== 'undefined' ? localStorage.getItem('circle_user_token') : null
+          const ek = typeof window !== 'undefined' ? localStorage.getItem('circle_encryption_key') : null
+          if (ut && ek) return { ut, ek }
+          await new Promise((r) => setTimeout(r, intervalMs))
+        }
+        return { ut: null as any, ek: null as any }
+      }
+      const { ut, ek } = await waitForTokens()
+      if (!ut || !ek) throw new Error('Social login did not return tokens')
+
+      setAuthentication(ut, ek)
 
       // 5) Initialize user and create wallet on server
       const accountType = process.env.NEXT_PUBLIC_ACCOUNT_TYPE || 'SCA' // 'SCA' for EVM, 'EOA' for Solana
@@ -68,7 +78,7 @@ export default function LoginForm() {
       const initRes = await fetch('/api/user/init', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userToken, accountType, blockchains }),
+        body: JSON.stringify({ userToken: ut, accountType, blockchains }),
       })
       if (!initRes.ok) {
         let errText = 'Failed to initialize user'
