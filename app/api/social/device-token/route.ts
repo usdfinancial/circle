@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
         Accept: 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ deviceId }),
+      body: JSON.stringify({
+        deviceId,
+        idempotencyKey: (globalThis as any).crypto?.randomUUID?.() || Math.random().toString(36).slice(2) + Date.now(),
+      }),
     })
 
     if (!resp.ok) {
