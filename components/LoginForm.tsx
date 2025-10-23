@@ -29,7 +29,14 @@ export default function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deviceId }),
       })
-      if (!dtRes.ok) throw new Error('Failed to create device token')
+      if (!dtRes.ok) {
+        let errText = 'Failed to create device token'
+        try {
+          const err = await dtRes.json()
+          errText = `${errText}: ${err?.error || ''} ${err?.status || ''} ${JSON.stringify(err?.details || err)}`
+        } catch {}
+        throw new Error(errText)
+      }
       const dtJson = await dtRes.json()
       const deviceToken: string = dtJson?.deviceToken || dtJson?.data?.deviceToken
       const deviceEncryptionKey: string = dtJson?.deviceEncryptionKey || dtJson?.data?.deviceEncryptionKey
@@ -63,7 +70,14 @@ export default function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userToken, accountType, blockchains }),
       })
-      if (!initRes.ok) throw new Error('Failed to initialize user')
+      if (!initRes.ok) {
+        let errText = 'Failed to initialize user'
+        try {
+          const err = await initRes.json()
+          errText = `${errText}: ${err?.error || ''}`
+        } catch {}
+        throw new Error(errText)
+      }
       const initJson = await initRes.json()
       const challengeId: string = initJson?.data?.challengeId || initJson?.challengeId
       if (!challengeId) throw new Error('No challengeId returned')

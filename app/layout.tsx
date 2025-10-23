@@ -4,6 +4,11 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Circle Wallet Demo',
   description: 'Email login and user-controlled wallet on Next.js + Netlify',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({

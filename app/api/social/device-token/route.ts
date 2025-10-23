@@ -16,14 +16,27 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        Accept: 'application/json',
+        'X-Api-Key': apiKey,
       },
       body: JSON.stringify({ deviceId }),
     })
 
     if (!resp.ok) {
-      const txt = await resp.text()
-      return NextResponse.json({ error: `Circle API error: ${txt}` }, { status: 502 })
+      let details: any = null
+      try {
+        details = await resp.json()
+      } catch {
+        details = { message: await resp.text() }
+      }
+      return NextResponse.json(
+        {
+          error: 'Circle API error',
+          status: resp.status,
+          details,
+        },
+        { status: 502 }
+      )
     }
 
     const json = await resp.json()
