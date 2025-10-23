@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'X-Api-Key': apiKey,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({ deviceId }),
     })
