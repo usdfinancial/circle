@@ -14,12 +14,8 @@ export function getSdk(): W3SSdk | null {
   if (sdk) return sdk
 
   sdk = new W3SSdk({
-    configs: {
-      appSettings: { appId: process.env.NEXT_PUBLIC_CIRCLE_APP_ID! },
-      authentication: {},
-      socialLoginConfig: {},
-    },
-    socialLoginCompleteCallback: (error, result) => {
+    appSettings: { appId: process.env.NEXT_PUBLIC_CIRCLE_APP_ID! },
+    socialLoginCompleteCallback: (error: any, result: any) => {
       // Consumer may also set authentication directly in component flows.
       if (error) return
       if (result?.userToken && result?.encryptionKey) {
@@ -75,7 +71,7 @@ export async function executeChallenge(challengeId: string) {
   const s = getSdk()
   if (!s) return
   return new Promise((resolve, reject) => {
-    s.execute(challengeId, (error, result) => {
+    s.execute(challengeId, (error: any, result: any) => {
       if (error) return reject(error)
       resolve(result)
     })
