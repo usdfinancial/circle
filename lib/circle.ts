@@ -18,15 +18,18 @@ export function getSdk(): W3SSdk | null {
   })
 
   // Attach a global social login completion callback via updateConfigs
-  sdk.updateConfigs({}, (error: any, result: any) => {
-    if (error) return
-    if (result?.userToken && result?.encryptionKey) {
-      try {
-        localStorage.setItem('circle_user_token', result.userToken)
-        localStorage.setItem('circle_encryption_key', result.encryptionKey)
-      } catch {}
+  sdk.updateConfigs(
+    { appSettings: { appId: process.env.NEXT_PUBLIC_CIRCLE_APP_ID! } },
+    (error: any, result: any) => {
+      if (error) return
+      if (result?.userToken && result?.encryptionKey) {
+        try {
+          localStorage.setItem('circle_user_token', result.userToken)
+          localStorage.setItem('circle_encryption_key', result.encryptionKey)
+        } catch {}
+      }
     }
-  })
+  )
 
   return sdk
 }
@@ -52,14 +55,18 @@ export function setLoginConfigs(configs: {
 }) {
   const s = getSdk()
   if (!s) return
-  s.updateConfigs({
-    loginConfigs: {
-      google: configs.google,
-      facebook: configs.facebook,
-      deviceToken: configs.deviceToken,
-      deviceEncryptionKey: configs.deviceEncryptionKey,
+  s.updateConfigs(
+    {
+      appSettings: { appId: process.env.NEXT_PUBLIC_CIRCLE_APP_ID! },
+      loginConfigs: {
+        google: configs.google,
+        facebook: configs.facebook,
+        deviceToken: configs.deviceToken,
+        deviceEncryptionKey: configs.deviceEncryptionKey,
+      },
     },
-  })
+    undefined
+  )
 }
 
 export async function performSocialLogin(provider: 'google' | 'facebook') {
