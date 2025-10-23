@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { initiateUserControlledWalletsClient } from '@circle-fin/user-controlled-wallets'
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,10 +12,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Server missing CIRCLE_API_KEY' }, { status: 500 })
     }
 
-    const client = initiateUserControlledWalletsClient({ apiKey })
-    const res = await client.createDeviceTokenForSocialLogin({ deviceId })
+    const resp = await fetch('https://api.circle.com/v1/users/social/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({ deviceId }),
+    })
 
-    return NextResponse.json(res)
+    if (!resp.ok) {
+      const txt = await resp.text()
+      return NextResponse.json({ error: `Circle API error: ${txt}` }, { status: 502 })
+    }
+
+    const json = await resp.json()
+    return NextResponse.json(json?.data ?? json)
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || 'Failed to create device token' }, { status: 500 })
   }

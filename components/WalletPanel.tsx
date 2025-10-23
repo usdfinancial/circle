@@ -1,28 +1,12 @@
 "use client"
 
-import { useEffect, useState } from 'react'
-import { initCircleIfPossible, isCircleConfigured } from '@/lib/circle'
+import { useState } from 'react'
+import { isCircleConfigured } from '@/lib/circle'
 
 export default function WalletPanel() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [network, setNetwork] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    ;(async () => {
-      if (!isCircleConfigured()) return
-      try {
-        const circle = await initCircleIfPossible()
-        if (!circle) return
-        // Placeholder: fetch wallet / user session from Circle SDK
-        // Example (pseudocode): const w = await circle.wallet.getActive()
-        // setWalletAddress(w?.address || null)
-        // setNetwork(w?.network || '')
-      } catch (e: any) {
-        setError(e?.message || 'Failed to load wallet info')
-      }
-    })()
-  }, [])
 
   return (
     <section className="rounded-lg border bg-white p-4 shadow-sm">
