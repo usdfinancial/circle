@@ -15,16 +15,17 @@ export function getSdk(): W3SSdk | null {
 
   sdk = new W3SSdk({
     appSettings: { appId: process.env.NEXT_PUBLIC_CIRCLE_APP_ID! },
-    socialLoginCompleteCallback: (error: any, result: any) => {
-      // Consumer may also set authentication directly in component flows.
-      if (error) return
-      if (result?.userToken && result?.encryptionKey) {
-        try {
-          localStorage.setItem('circle_user_token', result.userToken)
-          localStorage.setItem('circle_encryption_key', result.encryptionKey)
-        } catch {}
-      }
-    },
+  })
+
+  // Attach a global social login completion callback via updateConfigs
+  sdk.updateConfigs({}, (error: any, result: any) => {
+    if (error) return
+    if (result?.userToken && result?.encryptionKey) {
+      try {
+        localStorage.setItem('circle_user_token', result.userToken)
+        localStorage.setItem('circle_encryption_key', result.encryptionKey)
+      } catch {}
+    }
   })
 
   return sdk
